@@ -1,0 +1,9 @@
+# Ignore specific configuration files
+verif_plugin.toml
+verif_configuration
+
+# Ignore Jupyter Notebook's checkpoints
+**/.ipynb_checkpoints/
+
+# Ignore Python cache
+**/__pycache__/

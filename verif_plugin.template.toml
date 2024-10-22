@@ -1,0 +1,26 @@
+[general.plugin_registry.plugins]
+  spaveripy = "<path/to/plugin>"
+[suite_control]
+  suite_definition = "SpaveripySuiteDefinition"
+[submission]
+  submit_types = ["background_vm", "background_hpc", "parallel", "gnu", "serial", "spaveripy_group"]
+
+[submission.spaveripy_group]
+  SCHOST = "hpc"                             # Refers to the submission group in troika
+  tasks = ["ECFSdownloader", "LinkObs", "Regrid", "PlotRegrid", "Verification", "Panels"]
+  WRAPPER = ""
+
+[submission.spaveripy_group.BATCH]
+  NAME = "#SBATCH --job-name=@TASK_NAME@"
+  NODES = "#SBATCH --nodes=1"
+  NTASKS = "#SBATCH --ntasks=1"
+  WALLTIME = "#SBATCH --time=01:05:00"
+
+[submission.spaveripy_group.ENV]
+  VERIF_HOME = "<path/to/deode_spatial_verif>"
+  VERIF_OBS = "<OBS>"
+  ECFS_USER = "<USER>"
+
+[submission.spaveripy_group.MODULES]
+  ECFLOW = ["load", "ecflow"]
+  PYTHON311 = ["load", "python3/3.11.8-01"]
