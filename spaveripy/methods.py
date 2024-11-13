@@ -35,6 +35,7 @@ class ConfigSpaveripy(object):
             config (deode.ParsedConfig): Configuration
         """
         self.config = config
+        self.verif_user = os.environ.get("USER")
         self.home = os.environ.get("VERIF_HOME")
         if "VERIF_OBS" in os.environ:
             self.obs = os.environ.get("VERIF_OBS")
@@ -68,6 +69,7 @@ class ConfigSpaveripy(object):
         self.file_fp = self._set_file_fp()
         self.archive = self._set_archive()
         if self.ecfs_user is not None:
+            self.ext_archive = self._set_ext_archive()
             self.ecfs_archive = self._set_ecfs_archive()
         self.case = self._set_case()
         self.exp = self._set_exp()
@@ -116,15 +118,7 @@ class ConfigSpaveripy(object):
         config_filename = os.path.join(
             self.home, f"config/Case/config_{case}.yaml"
         )
-        if os.path.isfile(config_filename):
-            self._case_args = ConfigSpaveripy.load_yaml(config_filename)
-            date_end_config = datetime.strptime(
-                self._case_args["dates"]["end"], "%Y%m%d%H"
-            )
-            date_end_fcst = datetime.strptime(fcsts_str[-1], "%Y%m%d%H")
-            if date_end_fcst > date_end_config:
-                self._case_args["dates"]["end"] = fcsts_str[-1]
-        else:
+        if not os.path.isfile(config_filename):
             self._case_args = ConfigSpaveripy.load_yaml(
                 os.path.join(self.home, "config/templates/config_Case.yaml")
             )
@@ -139,8 +133,7 @@ class ConfigSpaveripy(object):
                     lon_min + dd, lon_max - dd, lat_min + dd, lat_max - dd
                 ]
             }
-
-        ConfigSpaveripy.save_yaml(config_filename, self._case_args)
+            ConfigSpaveripy.save_yaml(config_filename, self._case_args)
         return case
 
     def write_config_exp(self):
@@ -251,6 +244,11 @@ class ConfigSpaveripy(object):
         archive_timestamp = self.platform.get_system_value("archive_timestamp")
         archive = self.platform.get_system_value("archive")
         return archive.replace(archive_timestamp, archive_timestamp_replace)
+
+    def _set_ext_archive(self):
+        archive = self.archive
+        ext_archive = archive.replace(self.verif_user, self.ecfs_user)
+        return ext_archive
 
     def _set_ecfs_archive(self):
         archiving_prefix_raw = self.config["archiving.prefix.ecfs"]

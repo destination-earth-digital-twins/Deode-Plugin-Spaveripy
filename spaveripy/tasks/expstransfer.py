@@ -1,13 +1,14 @@
 """ECFSdownloader Task."""
 import os
 import subprocess
+from glob import glob
 from datetime import datetime
 
 from ..methods import ConfigSpaveripy, hours_between_dates, lead_time_replace
 from deode.tasks.base import Task
 
 
-class ECFSdownloader(Task):
+class ExpsTransfer(Task):
     """Link observation files to verif directory."""
 
     def __init__(self, config):
@@ -27,7 +28,10 @@ class ECFSdownloader(Task):
         for t_ini, t_end in zip(inits_str, lts_str):
             self._check_dest_dir(t_ini)
             if not self._files_exist_in_dest(t_ini, t_end):
-                self._download_files(t_ini)
+                try:
+                    self._transfer_files_from_scratch(t_ini)
+                except Exception as e:
+                    self._transfer_files_from_ecfs(t_ini)
 
     def _check_dest_dir(self, init_time):
         dest_dir_format = self.config_verif.archive
@@ -62,7 +66,28 @@ class ECFSdownloader(Task):
         )
         return True
 
-    def _download_files(self, init_time):
+    def _transfer_files_from_scratch(self, init_time):
+        source_dir_format = self.config_verif.ext_archive
+        file_format = self.config_verif.file_fp
+
+        date_init = datetime.strptime(init_time, self.date_format)
+        source_dir = date_init.strftime(source_dir_format)
+        file_name = lead_time_replace(file_format)
+        files_path = os.path.join(source_dir, file_name)
+        list_files = glob(files_path)
+        list_files.sort()
+
+        try:
+            print(
+                f"Copying {file_name} from {source_dir} to {self._dest_dir}."
+            )
+            subprocess.run(
+                ["cp", *list_files, self._dest_dir], check=True
+            )
+        except subprocess.CalledProcessError as e:
+            print(f"Error while copying '{file_name}': {e}")
+
+    def _transfer_files_from_ecfs(self, init_time):
         source_dir_format = self.config_verif.ecfs_archive
         file_format = self.config_verif.file_fp
 
@@ -76,7 +101,7 @@ class ECFSdownloader(Task):
                 f"Copying {file_name} from {source_dir} to {self._dest_dir}."
             )
             subprocess.run(
-                ['ecp', files_path, self._dest_dir], check=True
+                ["ecp", files_path, self._dest_dir], check=True
             )
         except subprocess.CalledProcessError as e:
             print(f"Error while copying '{file_name}': {e}")

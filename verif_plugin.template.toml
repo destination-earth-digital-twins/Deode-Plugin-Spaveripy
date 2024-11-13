@@ -7,7 +7,7 @@
 
 [submission.spaveripy_group]
   SCHOST = "hpc"                             # Refers to the submission group in troika
-  tasks = ["ECFSdownloader", "LinkObs", "Regrid", "PlotRegrid", "Verification", "Panels"]
+  tasks = ["ExpsTransfer", "LinkObs", "Regrid", "PlotRegrid", "Verification", "Panels"]
   WRAPPER = ""
 
 [submission.spaveripy_group.BATCH]

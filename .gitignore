@@ -1,6 +1,7 @@
 # Ignore specific configuration files
 verif_plugin.toml
 verif_configuration
+config/user_settings.env
 
 # Ignore Jupyter Notebook's checkpoints
 **/.ipynb_checkpoints/

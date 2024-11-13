@@ -56,8 +56,8 @@ class SpaveripySuiteDefinition(SuiteDefinition):
             self.ecf_files
         )
 
-        ecfs_downloader = EcflowSuiteTask(
-            "ECFSdownloader",
+        exps_transfer = EcflowSuiteTask(
+            "ExpsTransfer",
             exp_family,
             config,
             self.task_settings,
@@ -72,7 +72,7 @@ class SpaveripySuiteDefinition(SuiteDefinition):
             self.task_settings,
             self.ecf_files,
             input_template=python_template,
-            trigger=EcflowSuiteTriggers(EcflowSuiteTrigger(ecfs_downloader))
+            trigger=EcflowSuiteTriggers(EcflowSuiteTrigger(exps_transfer))
         )
 
         regrid = EcflowSuiteTask(
