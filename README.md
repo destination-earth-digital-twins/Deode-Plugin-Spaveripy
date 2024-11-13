@@ -33,3 +33,23 @@ Edit the `verif_plugin.toml` and replace the values `spaveripy` and `VERIF_HOME`
 ```bash
 deode case ?<path/to/plugin>/verif_configuration -o verif.toml --start-suite
 ```
+
+## Full verification exercise
+A [shell-script](https://github.com/DEODE-NWP/Deode-Plugin-Spaveripy/blob/master/bin/run_full_verif.sh) has been developed to automate the different steps of a complete verification exercise with the tool. In order to use it, it is necessary to create a configuration file inside the `config` directory:
+```bash
+cp config/user_settings.template.env config/user_settings.env
+```
+Edit the new file generated with your own paths, where `DEST_DIR` is the path where you want to save the configuration files with which the DEODE experiments have been run; `PLUGIN_DIR` is the root directory where this repository is located; `DW_DIR` is the root directory where the DEODE scripting system is located; `TOOL_DIR` is the directory where the copy of the spatial verification tool is located; and `LAUNCHS_DIR` is the directory where you want to save the shell-scripts that are automatically generated to run complete verification exercises for each case study. **Note: all these paths must have been previously created.**
+
+Once these paths are set, make sure that the `bin/run_full_verif.sh` file has execution permissions for your user:
+```bash
+chmod u+x bin/run_full_verif.sh
+```
+Finally, from the directory that contains it, run the following command:
+```bash
+./run_full_verif.sh -u <ecfs_user> -c <case> -o <obs>
+```
+where `<ecfs_user>` is the ATOS user that stores the experiment outputs, `<case>` is the name of the experiment case and `<obs>` is the database to use for verification (IMERG_pcp, SEVIRI_bt, OPERA_rain), e.g.:
+```bash
+./run_full_verif.sh -u aut6432 -c CY46h1_HARMONIE_AROME_nwp_ESP_20241029_conve_2_20241029 -o IMERG_pcp"
+```
