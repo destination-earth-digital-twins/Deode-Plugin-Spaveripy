@@ -2,7 +2,6 @@
 #SBATCH --job-name=spaverif
 #SBATCH --output=logs/log-%J.out
 #SBATCH --error=logs/err-%J.out
-#SBATCH --chdir=/home/esp0754/launchs
 #SBATCH --time=12:00:00
 #SBATCH --mem=32G
 module load python3/3.11.8-01

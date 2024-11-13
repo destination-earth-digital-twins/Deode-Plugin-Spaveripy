@@ -83,6 +83,7 @@ EXP_REF=$(grep "EXP REF VALUE:" "$TASK_LOG" | awk '{print $4}')
 # perform verification for reference experiment and run comparison
 LAUNCH_SCRIPT="$LAUNCHS_DIR/launch_spatial_verif_${CASE}.sh"
 cp "$LAUNCH_TEMPLATE_SCRIPT" "$LAUNCH_SCRIPT"
+sed -i "1a #SBATCH --chdir=$LAUNCHS_DIR" "$LAUNCH_SCRIPT"
 sed -i "s|^VERIF_DIR=\".*\"|VERIF_DIR=\"$TOOL_DIR\"|" "$LAUNCH_SCRIPT"
 sed -i "s/^OBS=\"[^\"]*\"/OBS=\"$OBS_VERIF\"/" "$LAUNCH_SCRIPT"
 sed -i "s/^Case=\"[^\"]*\"/Case=\"$CASE\"/" "$LAUNCH_SCRIPT"
