@@ -72,7 +72,7 @@ class UpdateRef(Task):
             self._exp_args["inits"].update(init_dict)
         else:
             self._exp_args = ConfigSpaveripy.load_yaml(
-                os.path.join(self.home, "config/templates/config_exp.yaml")
+                os.path.join(self.verif_home, "config/templates/config_exp.yaml")
             )
             self._exp_args["model"]["name"] = self.model
             self._exp_args["format"]["filepaths"] = [self.path_archive,]

@@ -50,7 +50,9 @@ fi
 
 # constants
 SOURCE_DIR="ec:/$ECFS_USER/deode"
+#SOURCE_DIR="/ec/res4/scratch/$ECFS_USER/deode"
 SRC_FILENAME="$SOURCE_DIR/$GENERAL_CASE/config.toml"
+#SRC_FILENAME="$SOURCE_DIR/$GENERAL_CASE/archive/config.toml"
 DEST_FILENAME="$DEST_DIR/$GENERAL_CASE.toml"
 VERIF_CONF="$PLUGIN_DIR/verif_configuration"
 VERIF_PLUGIN_TOML="$PLUGIN_DIR/verif_plugin.toml"
@@ -61,6 +63,7 @@ LAUNCH_TEMPLATE_SCRIPT="$PLUGIN_DIR/bin/launch_spatial_verif.template.sh"
 
 # Perform the copy
 ecp "$SRC_FILENAME" "$DEST_FILENAME"
+#cp "$SRC_FILENAME" "$DEST_FILENAME"
 
 # Replace arguments
 sed -i "2c\\$DEST_FILENAME" "$VERIF_CONF"
