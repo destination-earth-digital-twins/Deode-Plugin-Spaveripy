@@ -86,6 +86,7 @@ class ExpsTransfer(Task):
             )
         except subprocess.CalledProcessError as e:
             print(f"Error while copying '{file_name}': {e}")
+            raise
 
     def _transfer_files_from_ecfs(self, init_time):
         source_dir_format = self.config_verif.ecfs_archive

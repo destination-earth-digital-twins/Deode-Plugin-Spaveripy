@@ -35,21 +35,19 @@ class ConfigSpaveripy(object):
             config (deode.ParsedConfig): Configuration
         """
         self.config = config
-        self.verif_user = os.environ.get("USER")
-        self.home = os.environ.get("VERIF_HOME")
-        if "VERIF_OBS" in os.environ:
-            self.obs = os.environ.get("VERIF_OBS")
-        else:
-            self.obs = "IMERG_pcp"
-        self.ecfs_user = os.environ.get("ECFS_USER")
         self.platform = Platform(config)
-
+        self.verif_user = self.platform.get_value("submission.spaveripy_group.ENV.VERIF_USER")
+        self.duser= self.platform.get_value("submission.spaveripy_group.ENV.DUSER")        
+        self.home = self.platform.get_value("submission.spaveripy_group.ENV.VERIF_HOME")
+        self.obs = self.platform.get_value("submission.spaveripy_group.ENV.VERIF_OBS")
+        self.path_ref_gribs=self.platform.get_value("submission.spaveripy_group.ENV.PATH_REF_GRIBS")
+        self.ref_name = self.platform.get_value("submission.spaveripy_group.ENV.REF_NAME")
+        self.use_operational_indexing = self.platform.get_value("submission.spaveripy_group.ENV.USE_OPERATIONAL_INDEXING")
         self.cnmexp = self.config["general.cnmexp"]
         self.csc = self.config["general.csc"]
         self.cycle = self.config["general.cycle"]
         self.event_type = self.config["general.event_type"]
         self.start = self.platform.get_value("general.times.start")
-        self.end = self.platform.get_value("general.times.end")
         self.cycle_length = self.platform.get_value(
             "general.times.cycle_length"
         )
@@ -59,16 +57,18 @@ class ConfigSpaveripy(object):
         self.domain_name = self.config["domain.name"]
         self.nimax = self.platform.get_value("domain.nimax")
         self.njmax = self.platform.get_value("domain.njmax")
+        self.domain_number = self.platform.get_value("domain.number")
         self.xdx = self.platform.get_value("domain.xdx")
         self.xdy = self.platform.get_value("domain.xdy")
         self.xlatcen = self.platform.get_value("domain.xlatcen")
         self.xloncen = self.platform.get_value("domain.xloncen")
         self.xlat0 = self.platform.get_value("domain.xlat0")
         self.xlon0 = self.platform.get_value("domain.xlon0")
-
+        self.case_identifier = self.config["system.case_identifier"]
+        
         self.file_fp = self._set_file_fp()
         self.archive = self._set_archive()
-        if self.ecfs_user is not None:
+        if self.duser is not None:
             self.ext_archive = self._set_ext_archive()
             self.ecfs_archive = self._set_ecfs_archive()
         self.case = self._set_case()
@@ -78,14 +78,10 @@ class ConfigSpaveripy(object):
         self._exp_args = None
         self._vars_deode = {
             "pcp": {
-                "var": [
-                    "tirf",
-                    {"parameterCategory": 1, "parameterNumber": 75},
-                    "sprate"
-                ],
+                "var": "tp",
                 "accum": True,
                 "verif_0h": False,
-                "postprocess": "tp_deode",
+                "postprocess": "None",
                 "find_min": False
             },
             "rain": {
@@ -134,6 +130,7 @@ class ConfigSpaveripy(object):
                 ]
             }
             ConfigSpaveripy.save_yaml(config_filename, self._case_args)
+            print("Wrote config_case at {config_filename}")
         return case
 
     def write_config_exp(self):
@@ -171,14 +168,23 @@ class ConfigSpaveripy(object):
             self._exp_args["vars"] = self._vars_deode
 
         ConfigSpaveripy.save_yaml(config_filename, self._exp_args)
+        print("Wrote config_exp at {config_filename}")
+
         return exp
 
     def _get_times_args(self):
         date_ini = parser.parse(self.start)
-        date_end = parser.parse(self.end)
         freq = self.cycle_length[2:].lower()
-        fcst = int(self.forecast_range[2:].replace("H", ""))
-        dates = pd.date_range(date_ini, date_end, freq=freq).to_pydatetime()
+        match = re.match(r"P(\d+)(D|T(\d+)H)", self.forecast_range)
+        if match:
+            if match.group(2) == "D":  # Days format (e.g., P2D)
+               fcst = int(match.group(1)) * 24
+            else:  # Hours format (e.g., PT48H)
+               fcst = int(match.group(3))
+        else:
+            raise ValueError(f"Unrecognized forecast format: {forecast_range}")
+        date_end = date_ini + timedelta(hours=fcst)  # since date_end disappeared from config files
+        dates = pd.date_range(date_ini, date_ini, freq=timedelta(hours=fcst)).to_pydatetime() # Hardcode single runs for now
         inits = [date.strftime("%Y%m%d%H") for date in dates]
 
         fcsts = []
@@ -247,12 +253,12 @@ class ConfigSpaveripy(object):
 
     def _set_ext_archive(self):
         archive = self.archive
-        ext_archive = archive.replace(self.verif_user, self.ecfs_user)
+        ext_archive = archive.replace(self.verif_user, self.duser)
         return ext_archive
 
     def _set_ecfs_archive(self):
         archiving_prefix_raw = self.config["archiving.prefix.ecfs"]
-        archiving_prefix_replace = archiving_prefix_raw.replace("@USER@", self.ecfs_user)
+        archiving_prefix_replace = archiving_prefix_raw.replace("@USER@", self.duser)
         archiving_prefix = self.platform.substitute(archiving_prefix_replace)
         archive_timestamp_raw = self.config["system.archive_timestamp"]
         archive_timestamp_replace = (
@@ -262,7 +268,11 @@ class ConfigSpaveripy(object):
                                  .replace("@HH@", "%H")
         )
         archiving_ecfs_raw = self.config["archiving.hour.ecfs.grib_files.outpath"]
-        archiving_ecfs_replace = archiving_ecfs_raw.replace("@ARCHIVE_TIMESTAMP@", archive_timestamp_replace)
+        archiving_ecfs_raw = self.config["system.sub_casedir"]
+        explicit_case_identifier=self.case_identifier.replace("@XDX@",str(self.xdx)).replace("@EVENT_TYPE@",self.event_type).replace("@DOMAIN_NUMBER@",str(self.domain_number)).replace("@CSC@",self.csc)
+        archiving_ecfs_replace = archiving_ecfs_raw.replace("@ARCHIVE_TIMESTAMP@", archive_timestamp_replace).replace("@CASE_IDENTIFIER@",explicit_case_identifier)
+        print("archiving_ecfs_replace is") 
+        print(archiving_ecfs_replace)
         ecfs_archive = os.path.join(archiving_prefix, archiving_ecfs_replace)
         return ecfs_archive
 

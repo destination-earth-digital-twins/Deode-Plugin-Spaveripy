@@ -2,7 +2,7 @@
 # Script: run_full_verif.sh
 # Description: Automates the process of verification and comparison with Global DT.
 # Usage: ./run_full_verif.sh -u <ecfs_user> -c <case> -o <obs>
-
+set -x
 # initialise arguments
 ECFS_USER=""
 GENERAL_CASE=""
@@ -10,7 +10,7 @@ OBS_VERIF=""
 
 usage() {
   echo "Usage: $0 -u <ecfs_user> -c <case> -o <obs>"
-  echo "Example: $0 -u aut6432 -c CY46h1_HARMONIE_AROME_nwp_ESP_20241029_conve_2_20241029 -o IMERG_pcp"
+  echo "Example: $0 -u aut6432 -c CY46h1_HARMONIE_AROME_nwp_ESP_20241029_conve_2_20241029 -o IMERG_pcp -y YY -m MM -d DD -t TYPE -n NUMBER -s CSC"
   exit 1
 }
 
@@ -26,6 +26,30 @@ while [[ $# -gt 0 ]]; do
       ;;
     -o)
       OBS_VERIF="$2"
+      shift 2
+      ;;
+    -y)
+      YY="$2"
+      shift 2
+      ;;
+    -m)
+      MM="$2"
+      shift 2
+      ;;
+    -d)
+      DD="$2"
+      shift 2
+      ;;
+    -t)
+      TYPE="$2"
+      shift 2
+      ;;
+    -n)
+      NUMBER="$2"
+      shift 2
+      ;;
+    -s)
+      CSC="$2"
       shift 2
       ;;
     *)
@@ -48,19 +72,22 @@ if [[ -z "$DEST_DIR" || -z "$PLUGIN_DIR" || -z "$DW_DIR" || -z "$TOOL_DIR" || -z
   exit 1
 fi
 
+
+
 # constants
-SOURCE_DIR="ec:/$ECFS_USER/deode"
+SOURCE_DIR="ec:/$ECFS_USER/DE_NWP/deode/$YY/$MM/$DD/00/$TYPE/$NUMBER/$CSC/"
 #SOURCE_DIR="/ec/res4/scratch/$ECFS_USER/deode"
-SRC_FILENAME="$SOURCE_DIR/$GENERAL_CASE/config.toml"
+SRC_FILENAME="$SOURCE_DIR/config.toml"
 #SRC_FILENAME="$SOURCE_DIR/$GENERAL_CASE/archive/config.toml"
-DEST_FILENAME="$DEST_DIR/$GENERAL_CASE.toml"
+DEST_FILENAME="$DEST_DIR/$YY/$DD/$MM/$TYPE/$NUMBER/$CSC/$GENERAL_CASE.toml"
 VERIF_CONF="$PLUGIN_DIR/verif_configuration"
 VERIF_PLUGIN_TOML="$PLUGIN_DIR/verif_plugin.toml"
-VERIF_TOML="$DW_DIR/${GENERAL_CASE}_verif.toml"
+VERIF_TOML="$DEST_DIR/$YY/$DD/$MM/$TYPE/$NUMBER/$CSC/${GENERAL_CASE}_verif.toml"
 TASK="updateref"
 TASK_LOG="$LAUNCHS_DIR/$TASK.log"
 LAUNCH_TEMPLATE_SCRIPT="$PLUGIN_DIR/bin/launch_spatial_verif.template.sh"
 
+mkdir -p $DEST_DIR/$YY/$DD/$MM/$TYPE/$NUMBER/$CSC/
 # Perform the copy
 ecp "$SRC_FILENAME" "$DEST_FILENAME"
 #cp "$SRC_FILENAME" "$DEST_FILENAME"

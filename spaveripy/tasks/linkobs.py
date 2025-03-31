@@ -26,4 +26,5 @@ class LinkObs(Task):
         obs = self.config_verif.obs
         case = self.config_verif.write_config_case()
         exp = self.config_verif.write_config_exp()
+        self.batch.run(f"{self.binary} -V")
         self.batch.run(f"{self.binary} main.py --obs {obs} --case {case} --exp {exp} --link_obs")

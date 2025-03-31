@@ -22,9 +22,9 @@ class UpdateRef(Task):
         self.load_var_env("../../config/user_settings.env")
         self.verif_home = os.environ.get("TOOL_DIR")
         self.config_verif = ConfigSpaveripy(self.config)
-        self.exp_name = "rd_i4ql"
+        self.exp_name = "iekm"
         self.model = "DestinE 4.4 km"
-        self.path_archive = "/ec/res4/scratch/sp3c/deode_project/DT_data/%Y%m%d"
+        self.path_archive = os.path.join(self.config_verif.path_ref_gribs,"%Y%m%d")        
         self.filename = "ICMGG+%Lgrib2.sfc"
         self._exp_args = None
         self._vars_dt = {
