@@ -1,5 +1,5 @@
 [general.plugin_registry.plugins]
-  spaveripy = "/home/sp3c/deode_project/deode_plugins/spaverify/"
+  spaveripy = "/home/sp3c/deode_project/deode_plugins/spaverifynew/"
 [platform]
   deode_home = "set-by-the-system"
 [suite_control]
@@ -31,7 +31,11 @@
   ECFS_ARCHIVE_RELPATH_HARPOUTPUT="/deode/SPAVERIF/cases/" # Root to store the HARP results in permanent archive
   ECFS_ARCHIVE_RELPATH_DEODEOUTPUT="/deode/" #Normally /deode/ for generic users, /DE_NWP/deode/ for operational (aut6432)
   USE_OPERATIONAL_INDEXING="no" # Wether to use the Operational indexing (use in combination with operational DUSER=aut6432)
-
+  TOMLS_DIR="/ec/res4/hpcperm/sp3c/deode_project/deode_spatial_verif/tomls/"   # Where to store the toml files which configure the OD case & spatial verification suite.
+  PLUGIN_DIR="/home/sp3c/deode_project/deode_plugins/spaverifynew/" #Location of the spatial verification plugin
+  DW_DIR="/home/sp3c/deode_project/Deode-Workflow/"                 #Location of the DW.
+  TOOL_DIR="/ec/res4/hpcperm/sp3c/deode_project/deode_spatial_verif/"     #Location of the Spatial verification software
+  LAUNCHS_DIR="/ec/res4/hpcperm/sp3c/deode_project/deode_spatial_verif/standalones/"  # Where to store the scripts that launch some verification steps outside of the suites.
 
 
 [submission.spaveripy_group.MODULES]

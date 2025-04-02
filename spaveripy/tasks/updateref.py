@@ -19,9 +19,8 @@ class UpdateRef(Task):
 
         path_task = os.path.dirname(os.path.abspath(__file__))
         os.chdir(path_task)
-        self.load_var_env("../../config/user_settings.env")
-        self.verif_home = os.environ.get("TOOL_DIR")
         self.config_verif = ConfigSpaveripy(self.config)
+        self.verif_home = self.config_verif.tool_dir
         self.exp_name = "iekm"
         self.model = "DestinE 4.4 km"
         self.path_archive = os.path.join(self.config_verif.path_ref_gribs,"%Y%m%d")        

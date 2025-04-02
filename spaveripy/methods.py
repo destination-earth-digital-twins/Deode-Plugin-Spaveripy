@@ -43,6 +43,11 @@ class ConfigSpaveripy(object):
         self.path_ref_gribs=self.platform.get_value("submission.spaveripy_group.ENV.PATH_REF_GRIBS")
         self.ref_name = self.platform.get_value("submission.spaveripy_group.ENV.REF_NAME")
         self.use_operational_indexing = self.platform.get_value("submission.spaveripy_group.ENV.USE_OPERATIONAL_INDEXING")
+        self.dest_dir = self.platform.get_value("submission.spaveripy_group.ENV.DEST_DIR")
+        self.plugin_dir = self.platform.get_value("submission.spaveripy_group.ENV.PLUGIN_DIR")
+        self.dw_dir = self.platform.get_value("submission.spaveripy_group.ENV.DW_DIR")
+        self.tool_dir = self.platform.get_value("submission.spaveripy_group.ENV.TOOL_DIR")
+        self.launchs_dir = self.platform.get_value("submission.spaveripy_group.ENV.LAUNCHS_DIR")        	
         self.cnmexp = self.config["general.cnmexp"]
         self.csc = self.config["general.csc"]
         self.cycle = self.config["general.cycle"]

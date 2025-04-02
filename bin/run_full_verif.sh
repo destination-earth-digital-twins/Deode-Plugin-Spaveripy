@@ -64,10 +64,11 @@ if [[ -z "$ECFS_USER" || -z "$GENERAL_CASE" || -z "$OBS_VERIF" ]]; then
   usage
 fi
 
-# source env
-source ../config/user_settings.env
+# source environment variables from verif_plugin.toml
+plugin_toml=verif_plugin.toml
+export $(grep -E '^\s*[A-Z_]+\s*=' $plugin_toml | sed -E 's/\s*=\s*/=/' | tr -d '"' | awk '{print $1}')
 
-if [[ -z "$DEST_DIR" || -z "$PLUGIN_DIR" || -z "$DW_DIR" || -z "$TOOL_DIR" || -z "$LAUNCHS_DIR" ]]; then
+if [[ -z "$TOMLS_DIR" || -z "$PLUGIN_DIR" || -z "$DW_DIR" || -z "$TOOL_DIR" || -z "$LAUNCHS_DIR" ]]; then
   echo "Error: Missing required environment"
   exit 1
 fi
@@ -79,15 +80,15 @@ SOURCE_DIR="ec:/$ECFS_USER/DE_NWP/deode/$YY/$MM/$DD/00/$TYPE/$NUMBER/$CSC/"
 #SOURCE_DIR="/ec/res4/scratch/$ECFS_USER/deode"
 SRC_FILENAME="$SOURCE_DIR/config.toml"
 #SRC_FILENAME="$SOURCE_DIR/$GENERAL_CASE/archive/config.toml"
-DEST_FILENAME="$DEST_DIR/$YY/$DD/$MM/$TYPE/$NUMBER/$CSC/$GENERAL_CASE.toml"
+DEST_FILENAME="$TOMLS_DIR/$YY/$DD/$MM/$TYPE/$NUMBER/$CSC/$GENERAL_CASE.toml"
 VERIF_CONF="$PLUGIN_DIR/verif_configuration"
 VERIF_PLUGIN_TOML="$PLUGIN_DIR/verif_plugin.toml"
-VERIF_TOML="$DEST_DIR/$YY/$DD/$MM/$TYPE/$NUMBER/$CSC/${GENERAL_CASE}_verif.toml"
+VERIF_TOML="$TOMLS_DIR/$YY/$DD/$MM/$TYPE/$NUMBER/$CSC/${GENERAL_CASE}_verif.toml"
 TASK="updateref"
 TASK_LOG="$LAUNCHS_DIR/$TASK.log"
 LAUNCH_TEMPLATE_SCRIPT="$PLUGIN_DIR/bin/launch_spatial_verif.template.sh"
 
-mkdir -p $DEST_DIR/$YY/$DD/$MM/$TYPE/$NUMBER/$CSC/
+mkdir -p $TOMLS_DIR/$YY/$DD/$MM/$TYPE/$NUMBER/$CSC/
 # Perform the copy
 ecp "$SRC_FILENAME" "$DEST_FILENAME"
 #cp "$SRC_FILENAME" "$DEST_FILENAME"
@@ -112,6 +113,7 @@ EXP_REF=$(grep "EXP REF VALUE:" "$TASK_LOG" | awk '{print $4}')
 
 # perform verification for reference experiment and run comparison
 LAUNCH_SCRIPT="$LAUNCHS_DIR/launch_spatial_verif_${CASE}.sh"
+mkdir -p $LAUNCHS_DIR   # Create this dir if it doesn't exist
 cp "$LAUNCH_TEMPLATE_SCRIPT" "$LAUNCH_SCRIPT"
 sed -i "1a #SBATCH --chdir=$LAUNCHS_DIR" "$LAUNCH_SCRIPT"
 sed -i "s|^VERIF_DIR=\".*\"|VERIF_DIR=\"$TOOL_DIR\"|" "$LAUNCH_SCRIPT"
