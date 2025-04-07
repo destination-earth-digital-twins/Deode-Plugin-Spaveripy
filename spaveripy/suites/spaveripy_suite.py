@@ -43,6 +43,7 @@ class SpaveripySuiteDefinition(SuiteDefinition):
         self.config_verif = ConfigSpaveripy(self.config)
         case = self.config_verif.case
         exp = self.config_verif.exp
+        ref = self.config_verif.ref_name
 
         case_family = EcflowSuiteFamily(
             case,
@@ -55,7 +56,16 @@ class SpaveripySuiteDefinition(SuiteDefinition):
             case_family,
             self.ecf_files
         )
-
+        ref_family = EcflowSuiteFamily(
+            ref,
+            case_family,
+            self.ecf_files
+        )
+        compare_family=EcflowSuiteFamily(
+             "Compare",
+             case_family,
+             self.ecf_files
+        )
         exps_transfer = EcflowSuiteTask(
             "ExpsTransfer",
             exp_family,
@@ -114,3 +124,34 @@ class SpaveripySuiteDefinition(SuiteDefinition):
             input_template=python_template,
             trigger=EcflowSuiteTriggers(EcflowSuiteTrigger(plot_regrid))
         )
+
+
+        refupdate = EcflowSuiteTask(
+            "RefUpdate",
+            ref_family,
+            config,
+            self.task_settings, 
+            self.ecf_files,
+            input_template=python_template,
+            trigger=EcflowSuiteTriggers(EcflowSuiteTrigger(linkobs))
+        )
+
+
+        verifyref = EcflowSuiteTask(
+            "VerifyRef",
+            ref_family,
+            config,
+            self.task_settings, 
+            self.ecf_files,
+            input_template=python_template,
+            trigger=EcflowSuiteTriggers(EcflowSuiteTrigger(refupdate))
+        )
+        expvsref = EcflowSuiteTask(
+            "ExpVsRef",
+            compare_family,
+            config,
+            self.task_settings,
+            self.ecf_files,
+            input_template=python_template,
+            trigger=EcflowSuiteTriggers(EcflowSuiteTrigger(verif))
+        ) 

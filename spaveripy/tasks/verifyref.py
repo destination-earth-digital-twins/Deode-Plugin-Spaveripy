@@ -1,4 +1,4 @@
-"""Panels Task."""
+"""Verification Task."""
 import os
 
 from ..methods import ConfigSpaveripy
@@ -6,8 +6,8 @@ from deode.tasks.base import Task
 from deode.tasks.batch import BatchJob
 
 
-class Panels(Task):
-    """Create panels with generated plots"""
+class VerifyRef(Task):
+    """Compute FSS and SAL values"""
 
     def __init__(self, config):
         """Construct object.
@@ -25,6 +25,10 @@ class Panels(Task):
         os.chdir(self.config_verif.home)
         obs = self.config_verif.obs
         case = self.config_verif.case
-        exp = self.config_verif.exp
+        ref = self.config_verif.ref_name
         relative_indexed_path = self.config_verif.relative_indexed_path
-        self.batch.run(f"{self.binary} main.py --obs {obs} --case {case} --exp {exp}  --relative_indexed_path={relative_indexed_path}  --run_panels")
+        if "ECCODES_DEFINITION_PATH" in os.environ:
+            del os.environ["ECCODES_DEFINITION_PATH"]
+        self.batch.run(f"{self.binary} main.py --obs {obs} --case {case} --exp {ref} --relative_indexed_path={relative_indexed_path} --link_obs --run_regrid --run_plot_regrid --run_verif --run_panels")
+        #self.batch.run(f"{self.binary} main.py --obs {obs} --case {case} --exp {ref} --relative_indexed_path={relative_indexed_path} --run_verif --run_panels")
+        

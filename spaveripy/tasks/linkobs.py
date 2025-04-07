@@ -26,5 +26,6 @@ class LinkObs(Task):
         obs = self.config_verif.obs
         case = self.config_verif.write_config_case()
         exp = self.config_verif.write_config_exp()
+        relative_indexed_path = self.config_verif.relative_indexed_path
         self.batch.run(f"{self.binary} -V")
-        self.batch.run(f"{self.binary} main.py --obs {obs} --case {case} --exp {exp} --link_obs")
+        self.batch.run(f"{self.binary} main.py --obs {obs} --case {case} --exp {exp} --relative_indexed_path={relative_indexed_path} --link_obs")

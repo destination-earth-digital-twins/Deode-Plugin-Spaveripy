@@ -12,7 +12,7 @@
 
 [submission.spaveripy_group]
   SCHOST = "hpc"                             # Refers to the submission group in troika
-  tasks = ["ExpsTransfer", "LinkObs", "Regrid", "PlotRegrid", "Verification", "Panels"]
+  tasks = ["ExpsTransfer", "LinkObs", "Regrid", "PlotRegrid",  "Verification", "Panels", "RefUpdate","VerifyRef"]
   WRAPPER = ""
 
 [submission.spaveripy_group.BATCH]
@@ -22,15 +22,14 @@
   WALLTIME = "#SBATCH --time=01:05:00"
 
 [submission.spaveripy_group.ENV]
-  VERIF_HOME = "/ec/res4/hpcperm/sp3c/deode_project/deode_spatial_verif/"
   VERIF_OBS = "IMERG_pcp"
   DUSER = "aut6432"
   VERIF_USER = "sp3c"
-  PATH_REF_GRIBS="/ec/res4/hpcperm/sp3c/deode_project/deode_harp_output/FCTABLE/" # Where to find sqlites for the Reference model
+  PATH_REF_GRIBS="/ec/res4/scratch/aut6432/DE_Verification/GRIBS/GDT_iekm/" # Where to find gribs for the reference model
   REF_NAME="Global_DT" # Name of your Reference model
   ECFS_ARCHIVE_RELPATH_HARPOUTPUT="/deode/SPAVERIF/cases/" # Root to store the HARP results in permanent archive
   ECFS_ARCHIVE_RELPATH_DEODEOUTPUT="/deode/" #Normally /deode/ for generic users, /DE_NWP/deode/ for operational (aut6432)
-  USE_OPERATIONAL_INDEXING="no" # Wether to use the Operational indexing (use in combination with operational DUSER=aut6432)
+  USE_OPERATIONAL_INDEXING="yes" # Wether to use the Operational indexing (use in combination with operational DUSER=aut6432)
   TOMLS_DIR="/ec/res4/hpcperm/sp3c/deode_project/deode_spatial_verif/tomls/"   # Where to store the toml files which configure the OD case & spatial verification suite.
   PLUGIN_DIR="/home/sp3c/deode_project/deode_plugins/spaverifynew/" #Location of the spatial verification plugin
   DW_DIR="/home/sp3c/deode_project/Deode-Workflow/"                 #Location of the DW.
@@ -54,7 +53,8 @@
   WALLTIME = "#SBATCH --time=03:00:00"
 [submission.task_exceptions.Panels.BATCH]
   WALLTIME = "#SBATCH --time=03:00:00"
-
-
-
+[submission.task_exceptions.RefUpdate.BATCH]
+  WALLTIME = "#SBATCH --time=03:00:00"
+[submission.task_exceptions.VerifyRef.BATCH]
+  WALLTIME = "#SBATCH --time=03:00:00"
 

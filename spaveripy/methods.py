@@ -38,7 +38,7 @@ class ConfigSpaveripy(object):
         self.platform = Platform(config)
         self.verif_user = self.platform.get_value("submission.spaveripy_group.ENV.VERIF_USER")
         self.duser= self.platform.get_value("submission.spaveripy_group.ENV.DUSER")        
-        self.home = self.platform.get_value("submission.spaveripy_group.ENV.VERIF_HOME")
+        self.home = self.platform.get_value("submission.spaveripy_group.ENV.TOOL_DIR")
         self.obs = self.platform.get_value("submission.spaveripy_group.ENV.VERIF_OBS")
         self.path_ref_gribs=self.platform.get_value("submission.spaveripy_group.ENV.PATH_REF_GRIBS")
         self.ref_name = self.platform.get_value("submission.spaveripy_group.ENV.REF_NAME")
@@ -53,12 +53,8 @@ class ConfigSpaveripy(object):
         self.cycle = self.config["general.cycle"]
         self.event_type = self.config["general.event_type"]
         self.start = self.platform.get_value("general.times.start")
-        self.cycle_length = self.platform.get_value(
-            "general.times.cycle_length"
-        )
-        self.forecast_range = self.platform.get_value(
-            "general.times.forecast_range"
-        )
+        self.cycle_length = self.platform.get_value("general.times.cycle_length")
+        self.forecast_range = self.platform.get_value("general.times.forecast_range")
         self.domain_name = self.config["domain.name"]
         self.nimax = self.platform.get_value("domain.nimax")
         self.njmax = self.platform.get_value("domain.njmax")
@@ -70,7 +66,19 @@ class ConfigSpaveripy(object):
         self.xlat0 = self.platform.get_value("domain.xlat0")
         self.xlon0 = self.platform.get_value("domain.xlon0")
         self.case_identifier = self.config["system.case_identifier"]
-        
+        if str(self.use_operational_indexing).strip().lower() in {"yes", "y", "true"}:
+           inits_str, fcsts_str = self._get_times_args()
+           # Extract year, month, day from the first init string
+           first_init = inits_str[0]  # Example: "2025040412"
+           dt = datetime.strptime(first_init, "%Y%m%d%H")
+           yy = dt.strftime("%Y")  # 4 digits
+           mm = dt.strftime("%m")
+           dd = dt.strftime("%d")
+           event_type = self.event_type
+           domain_number  = self.domain_number
+           self.relative_indexed_path=f"{yy}/{mm}/{dd}/{event_type}/{domain_number}"
+        else:
+           self.relative_indexed_path="/"
         self.file_fp = self._set_file_fp()
         self.archive = self._set_archive()
         if self.duser is not None:
@@ -114,10 +122,10 @@ class ConfigSpaveripy(object):
         """
         inits_str, fcsts_str = self._get_times_args()
         lon_min, lon_max, lat_min, lat_max = self._compute_extension()
-
-        case = self.case
+        case=self.case
+        relative_indexed_path=self.relative_indexed_path
         config_filename = os.path.join(
-            self.home, f"config/Case/config_{case}.yaml"
+            self.home, f"config/Case/{relative_indexed_path}/config_{case}.yaml"
         )
         if not os.path.isfile(config_filename):
             self._case_args = ConfigSpaveripy.load_yaml(
@@ -134,6 +142,7 @@ class ConfigSpaveripy(object):
                     lon_min + dd, lon_max - dd, lat_min + dd, lat_max - dd
                 ]
             }
+            os.makedirs(os.path.dirname(config_filename), exist_ok=True)
             ConfigSpaveripy.save_yaml(config_filename, self._case_args)
             print("Wrote config_case at {config_filename}")
         return case
@@ -153,10 +162,10 @@ class ConfigSpaveripy(object):
                     "fcast_horiz": v
                 }
             })
-
         exp = self.exp
+        relative_indexed_path=self.relative_indexed_path
         config_filename = os.path.join(
-            self.home, f"config/exp/config_{exp}.yaml"
+            self.home, f"config/exp/{relative_indexed_path}/config_{exp}.yaml"
         )
         if os.path.isfile(config_filename):
             self._exp_args = ConfigSpaveripy.load_yaml(config_filename)
@@ -172,6 +181,7 @@ class ConfigSpaveripy(object):
             self._exp_args["inits"] = init_dict
             self._exp_args["vars"] = self._vars_deode
 
+        os.makedirs(os.path.dirname(config_filename), exist_ok=True)
         ConfigSpaveripy.save_yaml(config_filename, self._exp_args)
         print("Wrote config_exp at {config_filename}")
 

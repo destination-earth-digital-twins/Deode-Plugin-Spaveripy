@@ -26,6 +26,7 @@ class Regrid(Task):
         obs = self.config_verif.obs
         case = self.config_verif.case
         exp = self.config_verif.exp
+        relative_indexed_path = self.config_verif.relative_indexed_path
         if "ECCODES_DEFINITION_PATH" in os.environ:
             del os.environ["ECCODES_DEFINITION_PATH"]
-        self.batch.run(f"{self.binary} main.py --obs {obs} --case {case} --exp {exp} --run_regrid")
+        self.batch.run(f"{self.binary} main.py --obs {obs} --case {case} --exp {exp} --relative_indexed_path={relative_indexed_path} --run_regrid")

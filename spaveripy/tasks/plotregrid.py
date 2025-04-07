@@ -26,4 +26,5 @@ class PlotRegrid(Task):
         obs = self.config_verif.obs
         case = self.config_verif.case
         exp = self.config_verif.exp
-        self.batch.run(f"{self.binary} main.py --obs {obs} --case {case} --exp {exp} --run_plot_regrid")
+        relative_indexed_path = self.config_verif.relative_indexed_path
+        self.batch.run(f"{self.binary} main.py --obs {obs} --case {case} --exp {exp} --relative_indexed_path={relative_indexed_path} --run_plot_regrid")
