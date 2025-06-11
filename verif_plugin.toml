@@ -1,12 +1,12 @@
 [general.plugin_registry.plugins]
-  spaveripy = "/home/sp3c/deode_project/deode_plugins/spaverifynew/"
+  spaveripy = "/home/aut6432/DE_Verification/plugins/spaveripy/"
 [platform]
   deode_home = "set-by-the-system"
 [suite_control]
   suite_definition = "SpaveripySuiteDefinition"
 [scheduler.ecfvars]
-  case_prefix = "HARPVERIF_" # Add this to the suite name to not collide with OD case runs.
-  ecf_host = "ecflow-gen-sp3c-001" # Hardcode your ecflow server (needed after v0.12.0)
+  case_prefix = "DE_Verification_Spatial_" # Add this to the suite name to not collide with OD case runs.
+  ecf_host = "ecfg-aut6432-1" # Hardcode host name of your ecflow server (needed after v0.12.0)
 [submission]
   submit_types = ["background_vm", "background_hpc", "parallel", "gnu", "serial", "spaveripy_group"]
 
@@ -22,19 +22,19 @@
   WALLTIME = "#SBATCH --time=01:05:00"
 
 [submission.spaveripy_group.ENV]
-  VERIF_OBS = "IMERG_pcp"
+  VERIF_OBS = "OPERA_rain"
   DUSER = "aut6432"
-  VERIF_USER = "sp3c"
+  VERIF_USER = "aut6432"
   PATH_REF_GRIBS="/ec/res4/scratch/aut6432/DE_Verification/GRIBS/GDT_iekm/" # Where to find gribs for the reference model
   REF_NAME="Global_DT" # Name of your Reference model
-  ECFS_ARCHIVE_RELPATH_HARPOUTPUT="/deode/SPAVERIF/cases/" # Root to store the HARP results in permanent archive
-  ECFS_ARCHIVE_RELPATH_DEODEOUTPUT="/deode/" #Normally /deode/ for generic users, /DE_NWP/deode/ for operational (aut6432)
-  USE_OPERATIONAL_INDEXING="yes" # Wether to use the Operational indexing (use in combination with operational DUSER=aut6432)
-  TOMLS_DIR="/ec/res4/hpcperm/sp3c/deode_project/deode_spatial_verif/tomls/"   # Where to store the toml files which configure the OD case & spatial verification suite.
-  PLUGIN_DIR="/home/sp3c/deode_project/deode_plugins/spaverifynew/" #Location of the spatial verification plugin
-  DW_DIR="/home/sp3c/deode_project/Deode-Workflow/"                 #Location of the DW.
-  TOOL_DIR="/ec/res4/hpcperm/sp3c/deode_project/deode_spatial_verif/"     #Location of the Spatial verification software
-  LAUNCHS_DIR="/ec/res4/hpcperm/sp3c/deode_project/deode_spatial_verif/standalones/"  # Where to store the scripts that launch some verification steps outside of the suites.
+  ECFS_ARCHIVE_RELPATH_HARPOUTPUT="/deode/SPAVERIF/cases/" # Root to store the verification results in permanent archive
+  ECFS_ARCHIVE_RELPATH_DEODEOUTPUT="/DE_NWP/deode/" #Normally /deode/ for verifying experiments by generic users, /DE_NWP/deode/ for verifying experiments from the operational (aut6432) user
+  USE_OPERATIONAL_INDEXING="yes" # Wether to use the operational indexing of experiments (use in combination with operational DUSER=aut6432)
+  TOMLS_DIR="/ec/res4/hpcperm/aut6432/DE_Verification/verif_tools/deode_spatial_verif/tomls"   # Where to store a copy of the toml files which configure the OD case & the spatial verification suite.
+  PLUGIN_DIR="/home/aut6432/DE_Verification/plugins/spaveripy/" #Location of the spatial verification plugin
+  DW_DIR="/home/aut6432/DE_NWP/Deode-Workflow/"                 #Location of your copy of Deode-Workflow
+  TOOL_DIR="/ec/res4/hpcperm/aut6432/DE_Verification/verif_tools/deode_spatial_verif/"     #Location of the Spatial verification software
+  LAUNCHS_DIR="/ec/res4/hpcperm/aut6432/DE_Verification/verif_tools/deode_spatial_verif/standalones/"  # Where to store the scripts that launch some verification steps outside of the suites.
 
 
 [submission.spaveripy_group.MODULES]

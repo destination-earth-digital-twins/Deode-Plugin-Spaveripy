@@ -70,6 +70,7 @@ def main():
     
     # Start suite
     os.chdir(os.environ['DW_DIR'])
+    print("starting suite")
     subprocess.run(["poetry", "run", "deode", "case", f"?{verif_conf}", "-o", verif_toml, "--start-suite"])
     '''
     # Update config exp_ref

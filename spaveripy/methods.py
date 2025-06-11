@@ -282,10 +282,13 @@ class ConfigSpaveripy(object):
                                  .replace("@DD@", "%d")
                                  .replace("@HH@", "%H")
         )
-        archiving_ecfs_raw = self.config["archiving.hour.ecfs.grib_files.outpath"]
+        #archiving_ecfs_raw = self.config["archiving.hour.ecfs.grib_files.outpath"]
+        archiving_ecfs_raw = self.config["archiving.hour.ecfs.fpgrib_files.outpath"]  #for tag 0.15.0 and newer
         archiving_ecfs_raw = self.config["system.sub_casedir"]
         explicit_case_identifier=self.case_identifier.replace("@XDX@",str(self.xdx)).replace("@EVENT_TYPE@",self.event_type).replace("@DOMAIN_NUMBER@",str(self.domain_number)).replace("@CSC@",self.csc)
         archiving_ecfs_replace = archiving_ecfs_raw.replace("@ARCHIVE_TIMESTAMP@", archive_timestamp_replace).replace("@CASE_IDENTIFIER@",explicit_case_identifier)
+        print("archiving_ecfs_raw is")
+        print(archiving_ecfs_raw)
         print("archiving_ecfs_replace is") 
         print(archiving_ecfs_replace)
         ecfs_archive = os.path.join(archiving_prefix, archiving_ecfs_replace)

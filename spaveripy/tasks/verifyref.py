@@ -22,6 +22,8 @@ class VerifyRef(Task):
         self.batch = BatchJob(os.environ)
 
     def execute(self):
+        print('chdir to')
+        print(self.config_verif.home)
         os.chdir(self.config_verif.home)
         obs = self.config_verif.obs
         case = self.config_verif.case
@@ -29,6 +31,7 @@ class VerifyRef(Task):
         relative_indexed_path = self.config_verif.relative_indexed_path
         if "ECCODES_DEFINITION_PATH" in os.environ:
             del os.environ["ECCODES_DEFINITION_PATH"]
+        self.batch.run(f"module load python3; {self.binary} -V")
         self.batch.run(f"{self.binary} main.py --obs {obs} --case {case} --exp {ref} --relative_indexed_path={relative_indexed_path} --link_obs --run_regrid --run_plot_regrid --run_verif --run_panels")
         #self.batch.run(f"{self.binary} main.py --obs {obs} --case {case} --exp {ref} --relative_indexed_path={relative_indexed_path} --run_verif --run_panels")
         
